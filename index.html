@@ -1,0 +1,2427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="spartan.blog — premium digital ebooks with secure one-time payments and protected access.">
+  <meta name="theme-color" content="#11110f">
+  <title>spartan.blog — Premium Digital Ebooks</title>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <style>
+    :root {
+      --ink: #151513;
+      --muted: #68675f;
+      --paper: #f6f4ed;
+      --card: #fffdf8;
+      --line: rgba(21, 21, 19, 0.12);
+      --accent: #d9ff57;
+      --accent-dark: #b9e622;
+      --warm: #f2d6b7;
+      --danger: #bc403c;
+      --success: #276c46;
+      --shadow: 0 24px 70px rgba(30, 29, 23, 0.12);
+      --small-shadow: 0 12px 34px rgba(30, 29, 23, 0.08);
+      --radius: 24px;
+      --max-width: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 95% 5%, rgba(217, 255, 87, 0.18), transparent 28rem),
+        var(--paper);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img,
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    button {
+      border: 0;
+    }
+
+    :focus-visible {
+      outline: 3px solid rgba(94, 133, 0, 0.4);
+      outline-offset: 3px;
+    }
+
+    .container {
+      width: min(calc(100% - 40px), var(--max-width));
+      margin-inline: auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid transparent;
+      background: rgba(246, 244, 237, 0.82);
+      backdrop-filter: blur(18px);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .site-header.scrolled {
+      border-color: var(--line);
+      box-shadow: 0 8px 30px rgba(30, 29, 23, 0.05);
+    }
+
+    .header-inner {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 19px;
+      font-weight: 850;
+      letter-spacing: -0.045em;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 33px;
+      height: 33px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: var(--accent);
+      background: var(--ink);
+      box-shadow: 0 8px 20px rgba(21, 21, 19, 0.18);
+    }
+
+    .brand-mark svg {
+      width: 17px;
+    }
+
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .desktop-nav a {
+      position: relative;
+      color: #45443e;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .desktop-nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 100%;
+      bottom: -7px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--ink);
+      transition: right 0.2s ease;
+    }
+
+    .desktop-nav a:hover::after,
+    .desktop-nav a.active::after {
+      right: 0;
+    }
+
+    .header-action {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 18px;
+      border-radius: 999px;
+      color: white;
+      background: var(--ink);
+      font-size: 14px;
+      font-weight: 800;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .header-action:hover {
+      transform: translateY(-2px);
+      background: #2b2b27;
+    }
+
+    .menu-button {
+      width: 44px;
+      height: 44px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.55);
+      cursor: pointer;
+    }
+
+    .menu-button svg {
+      width: 22px;
+    }
+
+    .mobile-nav {
+      display: none;
+      padding: 4px 20px 20px;
+      border-top: 1px solid var(--line);
+      background: rgba(246, 244, 237, 0.97);
+    }
+
+    .mobile-nav.open {
+      display: grid;
+    }
+
+    .mobile-nav a {
+      padding: 13px 4px;
+      border-bottom: 1px solid var(--line);
+      font-size: 15px;
+      font-weight: 750;
+    }
+
+    .page {
+      display: none;
+      min-height: calc(100vh - 76px);
+      animation: pageIn 0.38s ease both;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes pageIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 88px 0 70px;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      left: -180px;
+      top: 80px;
+      border: 1px solid rgba(21, 21, 19, 0.08);
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 55px rgba(21, 21, 19, 0.025),
+        0 0 0 110px rgba(21, 21, 19, 0.018);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      align-items: center;
+      gap: 78px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 20px;
+      color: #4e4d46;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 24px;
+      height: 3px;
+      border-radius: 3px;
+      background: var(--accent-dark);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    .hero h1 {
+      max-width: 720px;
+      margin-bottom: 24px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(49px, 7vw, 86px);
+      line-height: 0.96;
+      letter-spacing: -0.065em;
+      font-weight: 500;
+    }
+
+    .hero h1 em {
+      position: relative;
+      z-index: 0;
+      font-style: italic;
+      white-space: nowrap;
+    }
+
+    .hero h1 em::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      height: 20%;
+      left: -2%;
+      right: -3%;
+      bottom: 8%;
+      border-radius: 20px;
+      background: var(--accent);
+      transform: rotate(-1deg);
+    }
+
+    .hero-copy {
+      max-width: 600px;
+      margin-bottom: 30px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .primary-button,
+    .secondary-button {
+      min-height: 54px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 24px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .primary-button {
+      color: white;
+      background: var(--ink);
+      box-shadow: 0 14px 28px rgba(21, 21, 19, 0.18);
+    }
+
+    .primary-button:hover {
+      transform: translateY(-2px);
+      background: #2a2a26;
+      box-shadow: 0 18px 36px rgba(21, 21, 19, 0.22);
+    }
+
+    .primary-button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secondary-button {
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .secondary-button:hover {
+      transform: translateY(-2px);
+      background: white;
+    }
+
+    .arrow-icon {
+      width: 18px;
+    }
+
+    .payment-note {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .payment-note svg {
+      width: 15px;
+      color: var(--success);
+    }
+
+    .cover-stage {
+      position: relative;
+      min-height: 540px;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+
+    .cover-stage::before {
+      content: "";
+      position: absolute;
+      z-index: -2;
+      width: 88%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--accent);
+      filter: saturate(0.9);
+    }
+
+    .cover-stage::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      width: 76%;
+      height: 76%;
+      border: 1px solid rgba(21, 21, 19, 0.16);
+      border-radius: 50%;
+    }
+
+    .book-wrap {
+      position: relative;
+      transform: rotate(4deg);
+      transition: transform 0.45s ease;
+      filter: drop-shadow(25px 35px 25px rgba(21, 21, 19, 0.22));
+    }
+
+    .book-wrap:hover {
+      transform: rotate(1deg) translateY(-8px);
+    }
+
+    .book-cover {
+      position: relative;
+      width: min(300px, 66vw);
+      aspect-ratio: 0.69;
+      overflow: hidden;
+      padding: 34px 30px;
+      border-radius: 4px 13px 13px 4px;
+      color: #1b1510;
+      background:
+        linear-gradient(90deg, rgba(53, 31, 19, 0.18), transparent 7%, transparent 95%, rgba(53, 31, 19, 0.12)),
+        linear-gradient(145deg, #dec0a1, #f0d8bf);
+      box-shadow:
+        inset 5px 0 10px rgba(64, 38, 20, 0.14),
+        inset -2px 0 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .book-cover::before,
+    .book-cover::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 19px solid rgba(140, 89, 51, 0.25);
+    }
+
+    .book-cover::before {
+      width: 270px;
+      height: 270px;
+      right: -145px;
+      bottom: -66px;
+    }
+
+    .book-cover::after {
+      width: 105px;
+      height: 105px;
+      right: -51px;
+      bottom: 17px;
+      border-width: 12px;
+    }
+
+    .cover-kicker {
+      position: relative;
+      z-index: 1;
+      display: block;
+      margin-bottom: 44px;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .book-cover h2 {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 43px;
+      line-height: 0.94;
+      letter-spacing: -0.055em;
+      font-weight: 500;
+    }
+
+    .cover-author {
+      position: absolute;
+      z-index: 2;
+      left: 30px;
+      bottom: 30px;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .digital-pill {
+      position: absolute;
+      right: -15px;
+      top: 68px;
+      z-index: 3;
+      padding: 10px 15px;
+      border: 3px solid var(--paper);
+      border-radius: 999px;
+      color: white;
+      background: var(--ink);
+      box-shadow: var(--small-shadow);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transform: rotate(-4deg);
+    }
+
+    .trust-strip {
+      padding: 22px 0;
+      color: white;
+      background: var(--ink);
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+      padding: 7px 24px;
+      border-right: 1px solid rgba(255, 255, 255, 0.13);
+    }
+
+    .trust-item:last-child {
+      border-right: 0;
+    }
+
+    .trust-icon {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .trust-icon svg {
+      width: 19px;
+    }
+
+    .trust-item strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .trust-item span {
+      display: block;
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 11px;
+    }
+
+    .section {
+      padding: 105px 0;
+    }
+
+    .section-heading {
+      max-width: 670px;
+      margin-bottom: 46px;
+    }
+
+    .section-heading h2 {
+      margin-bottom: 15px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(39px, 5vw, 57px);
+      line-height: 1.03;
+      letter-spacing: -0.05em;
+      font-weight: 500;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .product-card {
+      display: grid;
+      grid-template-columns: 0.88fr 1.12fr;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .product-art {
+      min-height: 600px;
+      display: grid;
+      place-items: center;
+      padding: 55px;
+      background:
+        radial-gradient(circle at center, transparent 0 28%, rgba(21, 21, 19, 0.07) 28.3% 28.8%, transparent 29.1% 41%, rgba(21, 21, 19, 0.05) 41.2% 41.7%, transparent 42%),
+        var(--accent);
+    }
+
+    .product-art .book-cover {
+      width: min(285px, 100%);
+      transform: rotate(-3deg);
+      box-shadow: 18px 28px 45px rgba(21, 21, 19, 0.25);
+    }
+
+    .product-details {
+      padding: 70px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .format-badge {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #4d4c46;
+      background: #f7f5ee;
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .format-badge svg {
+      width: 15px;
+    }
+
+    .product-details h2 {
+      margin-bottom: 10px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(38px, 5vw, 59px);
+      line-height: 1;
+      letter-spacing: -0.055em;
+      font-weight: 500;
+    }
+
+    .author {
+      margin-bottom: 24px;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .description {
+      max-width: 560px;
+      margin-bottom: 27px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .includes-list {
+      display: grid;
+      gap: 12px;
+      margin: 0 0 30px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .includes-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: #4e4d47;
+      font-size: 14px;
+    }
+
+    .includes-list svg {
+      width: 19px;
+      flex: 0 0 auto;
+      margin-top: 2px;
+      color: var(--success);
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+    }
+
+    .price-label {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .price {
+      font-size: 39px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.055em;
+    }
+
+    .one-time {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .buy-button {
+      min-width: 175px;
+      min-height: 58px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 24px;
+      border-radius: 15px;
+      color: var(--ink);
+      background: var(--accent);
+      box-shadow: 0 14px 30px rgba(166, 202, 39, 0.24);
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+
+    .buy-button:hover {
+      transform: translateY(-2px);
+      background: var(--accent-dark);
+      box-shadow: 0 18px 38px rgba(166, 202, 39, 0.3);
+    }
+
+    .buy-button svg {
+      width: 18px;
+    }
+
+    .how-section {
+      padding-top: 0;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .step-card {
+      position: relative;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255, 253, 248, 0.76);
+      box-shadow: var(--small-shadow);
+    }
+
+    .step-number {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 26px;
+      border-radius: 13px;
+      color: var(--accent);
+      background: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .step-card h3 {
+      margin-bottom: 8px;
+      font-size: 18px;
+      letter-spacing: -0.025em;
+    }
+
+    .step-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .fine-note {
+      max-width: 800px;
+      margin: 25px auto 0;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .page-hero {
+      padding: 90px 0 55px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .page-hero h1 {
+      max-width: 800px;
+      margin-bottom: 15px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(47px, 7vw, 76px);
+      line-height: 1;
+      letter-spacing: -0.06em;
+      font-weight: 500;
+    }
+
+    .page-hero p {
+      max-width: 650px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .content-section {
+      padding: 70px 0 110px;
+    }
+
+    .prose {
+      max-width: 790px;
+    }
+
+    .prose h2 {
+      margin: 45px 0 12px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 31px;
+      letter-spacing: -0.035em;
+      font-weight: 500;
+    }
+
+    .prose h2:first-child {
+      margin-top: 0;
+    }
+
+    .prose h3 {
+      margin: 30px 0 8px;
+      font-size: 18px;
+    }
+
+    .prose p,
+    .prose li {
+      color: #57564f;
+    }
+
+    .prose ul {
+      padding-left: 21px;
+    }
+
+    .prose li {
+      margin-bottom: 8px;
+    }
+
+    .prose a {
+      text-decoration: underline;
+      text-decoration-color: var(--accent-dark);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .updated {
+      margin-bottom: 35px;
+      padding: 12px 15px;
+      border-left: 3px solid var(--accent-dark);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.5);
+      font-size: 13px;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 0.9fr;
+      gap: 70px;
+      align-items: start;
+    }
+
+    .about-values {
+      display: grid;
+      gap: 14px;
+    }
+
+    .value-card {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: var(--small-shadow);
+    }
+
+    .value-card h3 {
+      margin-bottom: 7px;
+      font-size: 16px;
+    }
+
+    .value-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .contact-card,
+    .contact-form {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: var(--small-shadow);
+    }
+
+    .contact-card {
+      padding: 30px;
+    }
+
+    .contact-card h2 {
+      margin-bottom: 12px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 33px;
+      font-weight: 500;
+      letter-spacing: -0.04em;
+    }
+
+    .contact-card p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 24px;
+      font-size: 14px;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .contact-link span {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: var(--ink);
+      background: var(--accent);
+    }
+
+    .contact-link svg {
+      width: 19px;
+    }
+
+    .contact-form {
+      padding: 34px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #46453f;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      padding: 14px 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      outline: none;
+      color: var(--ink);
+      background: #fbfaf5;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: #91b315;
+      box-shadow: 0 0 0 4px rgba(185, 230, 34, 0.15);
+    }
+
+    .form-status {
+      display: none;
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      color: var(--success);
+      background: rgba(39, 108, 70, 0.1);
+      font-size: 13px;
+    }
+
+    .site-footer {
+      padding: 65px 0 30px;
+      color: rgba(255, 255, 255, 0.76);
+      background: var(--ink);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.7fr 0.9fr;
+      gap: 60px;
+      padding-bottom: 48px;
+    }
+
+    .footer-brand {
+      color: white;
+    }
+
+    .footer-copy {
+      max-width: 390px;
+      margin-top: 18px;
+      color: rgba(255, 255, 255, 0.53);
+      font-size: 13px;
+    }
+
+    .footer-heading {
+      margin-bottom: 16px;
+      color: white;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      width: fit-content;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding-top: 25px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.42);
+      font-size: 11px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      z-index: 100;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(11, 11, 10, 0.67);
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .checkout-modal {
+      position: relative;
+      width: min(100%, 510px);
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      border-radius: 25px;
+      background: var(--card);
+      box-shadow: 0 35px 100px rgba(0, 0, 0, 0.32);
+      animation: modalIn 0.28s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 26px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.035em;
+    }
+
+    .close-modal {
+      width: 37px;
+      height: 37px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: var(--ink);
+      background: #f2f0e9;
+      cursor: pointer;
+    }
+
+    .close-modal svg {
+      width: 18px;
+    }
+
+    .modal-body {
+      padding: 26px;
+    }
+
+    .checkout-product {
+      display: grid;
+      grid-template-columns: 70px 1fr auto;
+      align-items: center;
+      gap: 15px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mini-cover {
+      width: 70px;
+      height: 94px;
+      padding: 12px 9px;
+      border-radius: 3px 7px 7px 3px;
+      color: #1b1510;
+      background: linear-gradient(145deg, #dec0a1, #f0d8bf);
+      box-shadow: 7px 10px 18px rgba(21, 21, 19, 0.16);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .checkout-product h3 {
+      margin-bottom: 3px;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+
+    .checkout-product p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .checkout-price {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 21px 0;
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .modal-info {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 13px;
+      border-radius: 12px;
+      color: #55544d;
+      background: #f3f1e9;
+      font-size: 12px;
+    }
+
+    .modal-info svg {
+      width: 17px;
+      flex: 0 0 auto;
+      color: var(--success);
+    }
+
+    .checkout-button {
+      width: 100%;
+      min-height: 56px;
+    }
+
+    .checkout-button .spinner {
+      display: none;
+    }
+
+    .checkout-button.loading .button-text {
+      display: none;
+    }
+
+    .checkout-button.loading .spinner {
+      display: block;
+    }
+
+    .spinner {
+      width: 21px;
+      height: 21px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .payment-error {
+      display: none;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      color: var(--danger);
+      background: rgba(188, 64, 60, 0.09);
+      font-size: 12px;
+    }
+
+    .success-state {
+      display: none;
+      padding: 38px 26px 30px;
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      color: var(--success);
+      background: rgba(39, 108, 70, 0.11);
+    }
+
+    .success-icon svg {
+      width: 32px;
+    }
+
+    .success-state h2 {
+      margin-bottom: 8px;
+      font-size: 25px;
+      letter-spacing: -0.04em;
+    }
+
+    .success-state p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .download-button {
+      width: 100%;
+      margin-top: 13px;
+    }
+
+    .access-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    @media (max-width: 920px) {
+      .desktop-nav,
+      .header-action {
+        display: none;
+      }
+
+      .menu-button {
+        display: inline-flex;
+      }
+
+      .hero {
+        padding-top: 65px;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 55px;
+      }
+
+      .hero-content {
+        text-align: center;
+      }
+
+      .hero-copy {
+        margin-inline: auto;
+      }
+
+      .eyebrow {
+        justify-content: center;
+      }
+
+      .hero-actions {
+        justify-content: center;
+      }
+
+      .payment-note {
+        justify-content: center;
+      }
+
+      .cover-stage {
+        min-height: 500px;
+      }
+
+      .product-card {
+        grid-template-columns: 1fr;
+      }
+
+      .product-art {
+        min-height: 500px;
+      }
+
+      .product-details {
+        padding: 50px;
+      }
+
+      .about-grid,
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+
+      .footer-grid > div:last-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .container {
+        width: min(calc(100% - 28px), var(--max-width));
+      }
+
+      .header-inner {
+        min-height: 68px;
+      }
+
+      .hero {
+        padding: 56px 0 50px;
+      }
+
+      .hero h1 {
+        font-size: clamp(47px, 15vw, 69px);
+      }
+
+      .hero-copy {
+        font-size: 16px;
+      }
+
+      .hero-actions {
+        display: grid;
+      }
+
+      .hero-actions .primary-button,
+      .hero-actions .secondary-button {
+        width: 100%;
+      }
+
+      .cover-stage {
+        min-height: 430px;
+      }
+
+      .book-cover {
+        padding: 27px 23px;
+      }
+
+      .book-cover h2 {
+        font-size: 35px;
+      }
+
+      .cover-kicker {
+        margin-bottom: 36px;
+      }
+
+      .cover-author {
+        left: 23px;
+        bottom: 24px;
+      }
+
+      .trust-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .trust-item {
+        justify-content: flex-start;
+        padding: 13px 10px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+      }
+
+      .trust-item:last-child {
+        border-bottom: 0;
+      }
+
+      .section {
+        padding: 75px 0;
+      }
+
+      .product-card {
+        border-radius: 22px;
+      }
+
+      .product-art {
+        min-height: 400px;
+        padding: 40px;
+      }
+
+      .product-art .book-cover {
+        width: 225px;
+      }
+
+      .product-details {
+        padding: 35px 24px;
+      }
+
+      .price-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .buy-button {
+        width: 100%;
+      }
+
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .page-hero {
+        padding: 65px 0 42px;
+      }
+
+      .content-section {
+        padding: 50px 0 80px;
+      }
+
+      .field-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .contact-form {
+        padding: 24px 18px;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 35px;
+      }
+
+      .footer-grid > div:last-child {
+        grid-column: auto;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+      }
+
+      .checkout-product {
+        grid-template-columns: 60px 1fr auto;
+      }
+
+      .mini-cover {
+        width: 60px;
+        height: 82px;
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a href="#home" class="brand" aria-label="spartan.blog home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M6 18.5V5.5h8.1a3.9 3.9 0 0 1 0 7.8H9.5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9.5 9.4h4.2" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/>
+          </svg>
+        </span>
+        spartan.blog
+      </a>
+
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        <a href="#home" data-page-link="home">Home</a>
+        <a href="#about" data-page-link="about">About</a>
+        <a href="#contact" data-page-link="contact">Contact</a>
+      </nav>
+
+      <a class="header-action" href="#store">Browse ebook</a>
+
+      <button class="menu-button" id="menuButton" aria-label="Open navigation" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
+      <a href="#home">Home</a>
+      <a href="#store">Ebook store</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="#privacy">Privacy Policy</a>
+      <a href="#terms">Terms &amp; Conditions</a>
+      <a href="#refund">Refund / Cancellation</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page active" data-page="home">
+      <div class="hero">
+        <div class="container hero-grid">
+          <div class="hero-content">
+            <span class="eyebrow">Digital reading, made simple</span>
+            <h1>Ideas worth keeping, in a <em>better format.</em></h1>
+            <p class="hero-copy">
+              Discover thoughtfully selected digital ebooks. Pay once, receive protected access, and read on your device.
+            </p>
+
+            <div class="hero-actions">
+              <a href="#store" class="primary-button">
+                Explore the ebook
+                <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6"/>
+                </svg>
+              </a>
+              <a href="#about" class="secondary-button">About spartan.blog</a>
+
+              <div class="payment-note">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3 5 6v5c0 4.6 2.9 8.5 7 10 4.1-1.5 7-5.4 7-10V6l-7-3Z"/>
+                  <path d="m9 12 2 2 4-4"/>
+                </svg>
+                One-time payment via Razorpay. This is a digital product.
+              </div>
+            </div>
+          </div>
+
+          <div class="cover-stage" aria-label="The Psychology of Money ebook cover">
+            <div class="book-wrap">
+              <span class="digital-pill">Digital ebook</span>
+              <div class="book-cover">
+                <span class="cover-kicker">Timeless lessons on wealth, greed, and happiness</span>
+                <h2>The<br>Psychology<br>of Money</h2>
+                <span class="cover-author">Morgan Housel</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trust-strip">
+        <div class="container trust-grid">
+          <div class="trust-item">
+            <span class="trust-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="3" width="14" height="18" rx="2"/>
+                <path d="M9 7h6M9 11h6"/>
+              </svg>
+            </span>
+            <div>
+              <strong>Digital ebook</strong>
+              <span>No physical item is shipped</span>
+            </div>
+          </div>
+
+          <div class="trust-item">
+            <span class="trust-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="5" width="18" height="14" rx="3"/>
+                <path d="M3 10h18M7 15h3"/>
+              </svg>
+            </span>
+            <div>
+              <strong>One-time payment</strong>
+              <span>No recurring subscription</span>
+            </div>
+          </div>
+
+          <div class="trust-item">
+            <span class="trust-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3 5 6v5c0 4.6 2.9 8.5 7 10 4.1-1.5 7-5.4 7-10V6l-7-3Z"/>
+                <path d="M9 12h6"/>
+              </svg>
+            </span>
+            <div>
+              <strong>Protected access</strong>
+              <span>Released after payment verification</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="section" id="store">
+        <div class="container">
+          <div class="section-heading">
+            <span class="eyebrow">Featured ebook</span>
+            <h2>A clearer way to think about money.</h2>
+            <p>Purchase this downloadable digital ebook with a single payment.</p>
+          </div>
+
+          <article class="product-card">
+            <div class="product-art">
+              <div class="book-cover" aria-hidden="true">
+                <span class="cover-kicker">Timeless lessons on wealth, greed, and happiness</span>
+                <h2>The<br>Psychology<br>of Money</h2>
+                <span class="cover-author">Morgan Housel</span>
+              </div>
+            </div>
+
+            <div class="product-details">
+              <span class="format-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 2h9l4 4v16H6z"/>
+                  <path d="M14 2v5h5M9 13h6M9 17h5"/>
+                </svg>
+                Downloadable digital ebook
+              </span>
+
+              <h2>The Psychology of Money</h2>
+              <p class="author">by Morgan Housel</p>
+
+              <p class="description">
+                A compelling exploration of how behaviour, personal history, and emotion shape the financial decisions people make. The book presents enduring lessons about wealth, risk, patience, and happiness through concise stories and observations.
+              </p>
+
+              <ul class="includes-list">
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="m5 12 4 4L19 6"/>
+                  </svg>
+                  Digital ebook access after successful payment verification
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="m5 12 4 4L19 6"/>
+                  </svg>
+                  One-time payment with no recurring charges
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="m5 12 4 4L19 6"/>
+                  </svg>
+                  Protected, time-limited access link generated by the server
+                </li>
+              </ul>
+
+              <div class="price-row">
+                <div>
+                  <span class="price-label">Price</span>
+                  <strong class="price">₹49</strong>
+                  <span class="one-time">One-time payment</span>
+                </div>
+
+                <button class="buy-button" data-buy-button>
+                  Buy Now
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M13 6l6 6-6 6"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section how-section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="eyebrow">How access works</span>
+            <h2>From payment to reading in three steps.</h2>
+          </div>
+
+          <div class="steps">
+            <article class="step-card">
+              <span class="step-number">01</span>
+              <h3>Confirm your purchase</h3>
+              <p>Select Buy Now and review the ₹49 one-time payment for the digital ebook.</p>
+            </article>
+
+            <article class="step-card">
+              <span class="step-number">02</span>
+              <h3>Pay securely</h3>
+              <p>Complete payment through Razorpay using the available supported payment method.</p>
+            </article>
+
+            <article class="step-card">
+              <span class="step-number">03</span>
+              <h3>Access the ebook</h3>
+              <p>After server-side payment verification, a protected ebook access link is provided.</p>
+            </article>
+          </div>
+
+          <p class="fine-note">
+            The ebook file is not stored in this page or exposed before payment. Access must be issued by a secure backend after Razorpay signature verification.
+          </p>
+        </div>
+      </section>
+    </section>
+
+    <section class="page" data-page="about">
+      <header class="page-hero">
+        <div class="container">
+          <span class="eyebrow">About</span>
+          <h1>Digital ebooks, without unnecessary complexity.</h1>
+          <p>spartan.blog is designed as a focused store for downloadable reading material purchased through one-time payments.</p>
+        </div>
+      </header>
+
+      <div class="content-section">
+        <div class="container about-grid">
+          <div class="prose">
+            <h2>What we offer</h2>
+            <p>
+              spartan.blog provides digital ebooks. Products sold here are downloadable or digitally accessible files; no physical book or parcel is shipped.
+            </p>
+            <p>
+              Each product page explains the title, format, price, and access process before payment. Payment is processed through Razorpay, and access is released only after successful server-side payment verification.
+            </p>
+
+            <h2>A straightforward purchase</h2>
+            <p>
+              Purchases are one-time transactions, not subscriptions. Customers should review the product description and applicable policies before completing payment.
+            </p>
+          </div>
+
+          <div class="about-values">
+            <article class="value-card">
+              <h3>Clear product information</h3>
+              <p>Prices, digital format, and access terms are displayed before checkout.</p>
+            </article>
+            <article class="value-card">
+              <h3>Verified payment flow</h3>
+              <p>Payment confirmation is checked securely before an access link is issued.</p>
+            </article>
+            <article class="value-card">
+              <h3>Focused support</h3>
+              <p>Customers can contact support for payment or digital access issues.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" data-page="contact">
+      <header class="page-hero">
+        <div class="container">
+          <span class="eyebrow">Contact</span>
+          <h1>Need help with your ebook?</h1>
+          <p>Contact us regarding payment confirmation, download access, file issues, or policy questions.</p>
+        </div>
+      </header>
+
+      <div class="content-section">
+        <div class="container contact-grid">
+          <aside class="contact-card">
+            <h2>Customer support</h2>
+            <p>Include your payment ID when asking about a completed purchase. Never send card details, UPI PINs, passwords, or OTPs.</p>
+
+            <a class="contact-link" href="mailto:support@spartan.blog">
+              <span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="5" width="18" height="14" rx="2"/>
+                  <path d="m4 7 8 6 8-6"/>
+                </svg>
+              </span>
+              support@spartan.blog
+            </a>
+          </aside>
+
+          <form class="contact-form" id="contactForm">
+            <div class="field-row">
+              <div class="field">
+                <label for="contactName">Name</label>
+                <input id="contactName" name="name" type="text" autocomplete="name" required>
+              </div>
+              <div class="field">
+                <label for="contactEmail">Email address</label>
+                <input id="contactEmail" name="email" type="email" autocomplete="email" required>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="paymentId">Payment ID (optional)</label>
+              <input id="paymentId" name="paymentId" type="text" placeholder="pay_...">
+            </div>
+
+            <div class="field">
+              <label for="contactMessage">How can we help?</label>
+              <textarea id="contactMessage" name="message" required></textarea>
+            </div>
+
+            <button type="submit" class="primary-button">Prepare email</button>
+            <div class="form-status" id="formStatus" role="status">
+              Your email application has been opened with the message details.
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" data-page="privacy">
+      <header class="page-hero">
+        <div class="container">
+          <span class="eyebrow">Legal</span>
+          <h1>Privacy Policy</h1>
+          <p>How information may be handled when you browse, purchase, or request support.</p>
+        </div>
+      </header>
+
+      <div class="content-section">
+        <div class="container prose">
+          <div class="updated">Last updated: 1 June 2025</div>
+
+          <h2>Information collected</h2>
+          <p>
+            We may collect information you provide during checkout or support, including your name, email address, payment reference, and message content. Basic technical information such as browser type, IP address, access time, and security logs may also be processed to operate and protect the service.
+          </p>
+
+          <h2>Payment information</h2>
+          <p>
+            Payments are processed through Razorpay. Payment credentials are entered into Razorpay's checkout and are not intended to be stored by spartan.blog. Razorpay may process your information under its own privacy terms. We may receive transaction details such as payment status, payment ID, order ID, amount, and method.
+          </p>
+
+          <h2>How information is used</h2>
+          <ul>
+            <li>To create and verify ebook orders.</li>
+            <li>To provide protected digital access after payment.</li>
+            <li>To respond to support, refund, or access requests.</li>
+            <li>To prevent fraud, abuse, and unauthorised file distribution.</li>
+            <li>To meet legal, accounting, or regulatory obligations.</li>
+          </ul>
+
+          <h2>Sharing</h2>
+          <p>
+            Information may be shared with service providers that are necessary to process payments, host the website, deliver secure files, send transactional communications, or comply with law. Information is not sold as part of the ebook purchasing process.
+          </p>
+
+          <h2>Retention and security</h2>
+          <p>
+            Information should be retained only for as long as needed for access delivery, support, legal compliance, dispute handling, and security. Reasonable technical and organisational safeguards should be used, but no internet transmission or storage method can be guaranteed to be completely secure.
+          </p>
+
+          <h2>Your choices</h2>
+          <p>
+            You may contact <a href="mailto:support@spartan.blog">support@spartan.blog</a> to ask about your personal information or request correction or deletion where applicable. Certain transaction records may need to be retained by law.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" data-page="terms">
+      <header class="page-hero">
+        <div class="container">
+          <span class="eyebrow">Legal</span>
+          <h1>Terms &amp; Conditions</h1>
+          <p>Terms governing use of spartan.blog and purchases of digital ebooks.</p>
+        </div>
+      </header>
+
+      <div class="content-section">
+        <div class="container prose">
+          <div class="updated">Last updated: 1 June 2025</div>
+
+          <h2>Digital products</h2>
+          <p>
+            Products sold on spartan.blog are digital ebooks. No physical item is included or shipped unless a product page explicitly states otherwise. You are responsible for having a compatible device, software, and internet connection.
+          </p>
+
+          <h2>Orders and payment</h2>
+          <p>
+            The displayed price for “The Psychology of Money” is ₹49 as a one-time payment. Payment is processed through Razorpay. An order is complete only after payment has been successfully captured and verified by the server. A payment attempt, pending status, or debit without verification does not by itself grant ebook access.
+          </p>
+
+          <h2>Licence and permitted use</h2>
+          <p>
+            A completed purchase grants the customer a limited, non-exclusive, non-transferable licence to access the ebook for personal use, subject to any applicable publisher or product-specific terms. You may not resell, publicly distribute, upload, reproduce for commercial use, share protected links, bypass access controls, or falsely claim ownership.
+          </p>
+
+          <h2>Access links</h2>
+          <p>
+            Access links may be signed, limited by time, limited by use, or associated with the purchaser's order. You must keep access links private. If a valid link expires before reasonable access is possible, contact support with the relevant payment ID.
+          </p>
+
+          <h2>Product descriptions</h2>
+          <p>
+            We aim to display accurate titles, descriptions, prices, and formats. Screen colours and cover presentation may differ by device. Cover artwork on the website is a visual representation and does not change the supplied ebook content.
+          </p>
+
+          <h2>Intellectual property</h2>
+          <p>
+            Website design, branding, text, graphics, and software are protected by applicable intellectual property laws. Ebook rights remain with their respective authors, publishers, or authorised rights holders.
+          </p>
+
+          <h2>Acceptable use</h2>
+          <p>
+            You must not interfere with the service, attempt unauthorised access, misuse payment systems, automate downloads, distribute malicious software, or use the website unlawfully.
+          </p>
+
+          <h2>Liability</h2>
+          <p>
+            To the extent permitted by law, the service is provided without guarantees beyond those expressly stated. Nothing in these terms excludes rights or remedies that cannot legally be excluded under applicable consumer law.
+          </p>
+
+          <h2>Contact</h2>
+          <p>Questions about these terms may be sent to <a href="mailto:support@spartan.blog">support@spartan.blog</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" data-page="refund">
+      <header class="page-hero">
+        <div class="container">
+          <span class="eyebrow">Legal</span>
+          <h1>Refund &amp; Cancellation Policy</h1>
+          <p>Information about cancellations, duplicate payments, and digital access issues.</p>
+        </div>
+      </header>
+
+      <div class="content-section">
+        <div class="container prose">
+          <div class="updated">Last updated: 1 June 2025</div>
+
+          <h2>Before payment</h2>
+          <p>
+            You can cancel your purchase by closing the checkout before completing payment. No charge is made for an incomplete or cancelled payment attempt, although a temporary bank authorisation may be controlled by your bank or payment provider.
+          </p>
+
+          <h2>Digital ebook purchases</h2>
+          <p>
+            Ebooks are digital products delivered or made accessible after payment. Once an ebook has been successfully accessed or downloaded, the purchase is generally not eligible for cancellation or refund, except where required by law.
+          </p>
+
+          <h2>When to contact us</h2>
+          <p>Please contact support if:</p>
+          <ul>
+            <li>You were charged more than once for the same order.</li>
+            <li>Payment succeeded but verified ebook access was not provided.</li>
+            <li>The supplied file is corrupted, incomplete, or materially different from the product description.</li>
+            <li>An incorrect digital product was supplied.</li>
+          </ul>
+
+          <p>
+            Send the request to <a href="mailto:support@spartan.blog">support@spartan.blog</a> with your payment ID, order details, purchase email, and a description of the issue. Do not send card numbers, passwords, UPI PINs, or OTPs.
+          </p>
+
+          <h2>Resolution</h2>
+          <p>
+            Where an issue is confirmed, we may restore access, replace the file, correct the order, or approve a refund as appropriate. Approved refunds are returned through the original payment method and processing time depends on Razorpay, the bank, and the payment provider.
+          </p>
+
+          <h2>Failed or pending payments</h2>
+          <p>
+            If payment fails but an amount is debited, it may be automatically reversed by the bank or payment provider. If it is not reversed within the period communicated by your provider, contact support with the payment reference.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="#home" class="brand footer-brand">
+            <span class="brand-mark">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M6 18.5V5.5h8.1a3.9 3.9 0 0 1 0 7.8H9.5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9.5 9.4h4.2" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/>
+              </svg>
+            </span>
+            spartan.blog
+          </a>
+          <p class="footer-copy">
+            A focused store for downloadable digital ebooks purchased with secure one-time payments.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="footer-heading">Explore</h2>
+          <div class="footer-links">
+            <a href="#home">Home</a>
+            <a href="#store">Ebook store</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="footer-heading">Policies</h2>
+          <div class="footer-links">
+            <a href="#privacy">Privacy Policy</a>
+            <a href="#terms">Terms &amp; Conditions</a>
+            <a href="#refund">Refund / Cancellation</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© <span id="currentYear"></span> spartan.blog</span>
+        <span>Digital products only. No physical item is shipped.</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="checkoutBackdrop" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+    <div class="checkout-modal">
+      <div id="checkoutContent">
+        <div class="modal-header">
+          <h2 id="checkoutTitle">Order summary</h2>
+          <button class="close-modal" id="closeCheckout" aria-label="Close checkout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path d="m6 6 12 12M18 6 6 18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="checkout-product">
+            <div class="mini-cover">The Psychology of Money</div>
+            <div>
+              <h3>The Psychology of Money</h3>
+              <p>Digital ebook · One-time purchase</p>
+            </div>
+            <strong class="checkout-price">₹49</strong>
+          </div>
+
+          <div class="total-row">
+            <span>Total payable</span>
+            <span>₹49</span>
+          </div>
+
+          <div class="modal-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3 5 6v5c0 4.6 2.9 8.5 7 10 4.1-1.5 7-5.4 7-10V6l-7-3Z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+            <span>Razorpay handles checkout. Ebook access is provided only after the server verifies the payment signature.</span>
+          </div>
+
+          <button class="primary-button checkout-button" id="payButton">
+            <span class="button-text">Continue to secure payment · ₹49</span>
+            <span class="spinner" aria-label="Preparing payment"></span>
+          </button>
+
+          <div class="payment-error" id="paymentError" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="success-state" id="successState">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m5 12 4 4L19 6"/>
+          </svg>
+        </div>
+        <h2>Payment verified</h2>
+        <p>Your protected access is ready. Use the button below to open or download the digital ebook.</p>
+        <a class="primary-button download-button" id="downloadLink" href="#" rel="noopener">
+          Access ebook
+          <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 3v13M7 11l5 5 5-5M5 21h14"/>
+          </svg>
+        </a>
+        <p class="access-note">The access URL may expire for security. Do not share it publicly.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*
+      Razorpay server requirements:
+
+      POST /api/create-order
+      Request:  { "productId": "psychology-of-money-ebook" }
+      Response: {
+        "orderId": "order_...",
+        "amount": 4900,
+        "currency": "INR",
+        "keyId": "rzp_live_..."
+      }
+
+      POST /api/verify-payment
+      Request: {
+        "productId": "...",
+        "razorpay_order_id": "...",
+        "razorpay_payment_id": "...",
+        "razorpay_signature": "..."
+      }
+      Response after server-side signature verification:
+      {
+        "verified": true,
+        "accessUrl": "https://your-domain.example/protected-download/signed-token"
+      }
+
+      The backend must:
+      1. Create the ₹49 order using the Razorpay secret.
+      2. Never trust amount or product data supplied by the browser.
+      3. Verify the HMAC signature server-side.
+      4. Confirm order amount, currency, payment status, and product.
+      5. Return a short-lived signed access URL; never expose the ebook file publicly.
+      6. Make verification idempotent and store the transaction securely.
+    */
+
+    const PRODUCT_ID = "psychology-of-money-ebook";
+    const CREATE_ORDER_ENDPOINT = "/api/create-order";
+    const VERIFY_PAYMENT_ENDPOINT = "/api/verify-payment";
+
+    const header = document.getElementById("siteHeader");
+    const menuButton = document.getElementById("menuButton");
+    const mobileNav = document.getElementById("mobileNav");
+    const backdrop = document.getElementById("checkoutBackdrop");
+    const closeCheckout = document.getElementById("closeCheckout");
+    const payButton = document.getElementById("payButton");
+    const paymentError = document.getElementById("paymentError");
+    const checkoutContent = document.getElementById("checkoutContent");
+    const successState = document.getElementById("successState");
+    const downloadLink = document.getElementById("downloadLink");
+    let lastFocusedElement = null;
+
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+
+    window.addEventListener("scroll", () => {
+      header.classList.toggle("scrolled", window.scrollY > 8);
+    });
+
+    menuButton.addEventListener("click", () => {
+      const isOpen = mobileNav.classList.toggle("open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+      menuButton.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
+    });
+
+    mobileNav.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        mobileNav.classList.remove("open");
+        menuButton.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    function routeToHash() {
+      const hash = location.hash.replace("#", "") || "home";
+      const pageNames = ["home", "about", "contact", "privacy", "terms", "refund"];
+      const isStore = hash === "store";
+      const targetPage = pageNames.includes(hash) ? hash : "home";
+
+      document.querySelectorAll(".page").forEach(page => {
+        page.classList.toggle("active", page.dataset.page === targetPage || (isStore && page.dataset.page === "home"));
+      });
+
+      document.querySelectorAll("[data-page-link]").forEach(link => {
+        link.classList.toggle("active", link.dataset.pageLink === targetPage);
+      });
+
+      requestAnimationFrame(() => {
+        if (isStore) {
+          document.getElementById("store").scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+
+      document.title = targetPage === "home"
+        ? "spartan.blog — Premium Digital Ebooks"
+        : `${targetPage.charAt(0).toUpperCase() + targetPage.slice(1)} — spartan.blog`;
+    }
+
+    window.addEventListener("hashchange", routeToHash);
+    routeToHash();
+
+    function openCheckout() {
+      lastFocusedElement = document.activeElement;
+      paymentError.style.display = "none";
+      paymentError.textContent = "";
+      checkoutContent.style.display = "block";
+      successState.style.display = "none";
+      backdrop.classList.add("open");
+      document.body.classList.add("modal-open");
+      setTimeout(() => closeCheckout.focus(), 50);
+    }
+
+    function closeCheckoutModal() {
+      backdrop.classList.remove("open");
+      document.body.classList.remove("modal-open");
+      if (lastFocusedElement) lastFocusedElement.focus();
+    }
+
+    document.querySelectorAll("[data-buy-button]").forEach(button => {
+      button.addEventListener("click", openCheckout);
+    });
+
+    closeCheckout.addEventListener("click", closeCheckoutModal);
+
+    backdrop.addEventListener("click", event => {
+      if (event.target === backdrop) closeCheckoutModal();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && backdrop.classList.contains("open")) {
+        closeCheckoutModal();
+      }
+    });
+
+    function showPaymentError(message) {
+      paymentError.textContent = message;
+      paymentError.style.display = "block";
+    }
+
+    function setPaymentLoading(loading) {
+      payButton.disabled = loading;
+      payButton.classList.toggle("loading", loading);
+    }
+
+    async function createRazorpayOrder() {
+      const response = await fetch(CREATE_ORDER_ENDPOINT, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ productId: PRODUCT_ID })
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to prepare checkout. Please try again or contact support.");
+      }
+
+      const order = await response.json();
+
+      if (!order.orderId || !order.keyId || order.amount !== 4900 || order.currency !== "INR") {
+        throw new Error("The payment order response was invalid. No payment has been started.");
+      }
+
+      return order;
+    }
+
+    async function verifyPayment(response) {
+      const verificationResponse = await fetch(VERIFY_PAYMENT_ENDPOINT, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          productId: PRODUCT_ID,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature
+        })
+      });
+
+      if (!verificationResponse.ok) {
+        throw new Error("Payment was received but verification could not be completed. Contact support with your payment ID.");
+      }
+
+      const result = await verificationResponse.json();
+
+      if (!result.verified || !result.accessUrl) {
+        throw new Error("Payment verification was unsuccessful. Please contact support before trying again.");
+      }
+
+      return result;
+    }
+
+    function showSuccess(accessUrl) {
+      downloadLink.href = accessUrl;
+      checkoutContent.style.display = "none";
+      successState.style.display = "block";
+      setTimeout(() => downloadLink.focus(), 50);
+    }
+
+    payButton.addEventListener("click", async () => {
+      paymentError.style.display = "none";
+
+      if (typeof Razorpay === "undefined") {
+        showPaymentError("Secure checkout could not load. Check your connection and try again.");
+        return;
+      }
+
+      setPaymentLoading(true);
+
+      try {
+        const order = await createRazorpayOrder();
+
+        const options = {
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          name: "spartan.blog",
+          description: "The Psychology of Money — Digital Ebook",
+          order_id: order.orderId,
+          handler: async function (paymentResponse) {
+            setPaymentLoading(true);
+            paymentError.style.display = "none";
+
+            try {
+              const verified = await verifyPayment(paymentResponse);
+              showSuccess(verified.accessUrl);
+            } catch (error) {
+              showPaymentError(error.message || "Payment verification failed. Please contact support.");
+            } finally {
+              setPaymentLoading(false);
+            }
+          },
+          notes: {
+            product_id: PRODUCT_ID,
+            product_type: "digital_ebook"
+          },
+          theme: {
+            color: "#151513"
+          },
+          modal: {
+            ondismiss: function () {
+              setPaymentLoading(false);
+            }
+          }
+        };
+
+        const razorpay = new Razorpay(options);
+
+        razorpay.on("payment.failed", function (failure) {
+          setPaymentLoading(false);
+          const reason = failure && failure.error && failure.error.description
+            ? failure.error.description
+            : "Payment was not completed. You may try again.";
+          showPaymentError(reason);
+        });
+
+        razorpay.open();
+        setPaymentLoading(false);
+      } catch (error) {
+        setPaymentLoading(false);
+        showPaymentError(
+          error.message ||
+          "Checkout is not available at the moment. Please try again later."
+        );
+      }
+    });
+
+    document.getElementById("contactForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const form = new FormData(event.currentTarget);
+      const name = String(form.get("name") || "").trim();
+      const email = String(form.get("email") || "").trim();
+      const paymentId = String(form.get("paymentId") || "").trim();
+      const message = String(form.get("message") || "").trim();
+
+      const subject = encodeURIComponent(
+        paymentId ? `Ebook support request — ${paymentId}` : "Ebook support request"
+      );
+
+      const body = encodeURIComponent(
+        `Name: ${name}\nEmail: ${email}\nPayment ID: ${paymentId || "Not provided"}\n\nMessage:\n${message}`
+      );
+
+      document.getElementById("formStatus").style.display = "block";
+      window.location.href = `mailto:support@spartan.blog?subject=${subject}&body=${body}`;
+    });
+  </script>
+</body>
+</html>
